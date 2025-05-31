@@ -8,27 +8,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Models;
 
-[Table("ContactosCliente")]
-public partial class ContactosCliente
+public partial class Consultorio
 {
     [Key]
-    public int IdContacto { get; set; }
-
-    public int? IdCliente { get; set; }
-
-    [StringLength(100)]
-    public string? Nombre { get; set; }
-
-    [StringLength(100)]
-    public string? Cargo { get; set; }
-
-    [StringLength(100)]
-    public string? Email { get; set; }
+    public int IdConsultorio { get; set; }
 
     [StringLength(50)]
+    [Unicode(false)]
+    public string? Nombre { get; set; }
+
+    [StringLength(250)]
+    [Unicode(false)]
+    public string? Direccion { get; set; }
+
+    [StringLength(50)]
+    [Unicode(false)]
     public string? Telefono { get; set; }
 
-    [ForeignKey("IdCliente")]
-    [InverseProperty("ContactosClientes")]
-    public virtual Cliente? IdClienteNavigation { get; set; }
+    public bool? Estado { get; set; }
 }
