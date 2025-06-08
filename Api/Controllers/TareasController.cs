@@ -24,24 +24,30 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(DataSourceLoadOptions loadOptions) {
-            var tareas = _context.Tareas.Select(i => new {
-                i.IdTarea,
-                i.Titulo,
-                i.Descripcion,
-                i.Estado,
-                i.IdCaso,
-                i.IdUsuarioAsignado
-            });
-
-            // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
-            // This can make SQL execution plans more efficient.
-            // For more detailed information, please refer to this discussion: https://github.com/DevExpress/DevExtreme.AspNet.Data/issues/336.
-            // loadOptions.PrimaryKey = new[] { "IdTarea" };
-            // loadOptions.PaginateViaPrimaryKey = true;
+        public async Task<IActionResult> Get(DataSourceLoadOptions loadOptions)
+        {
+            var tareas = from t in _context.Tareas
+                         join c in _context.Casos on t.IdCaso equals c.IdCaso
+                         join u in _context.Usuarios on t.IdUsuarioAsignado equals u.IdUsuario
+                         select new
+                         {
+                             t.IdTarea,
+                             t.Titulo,
+                             t.Descripcion,
+                             t.FechaAsignacion,
+                             t.FechaLimite,
+                             t.Estado,
+                             t.IdCaso,
+                             t.IdUsuarioAsignado,
+                             c.CodigoCaso,
+                             TituloCaso = c.Titulo,
+                             u.NombreUsuario,
+                             u.IdUsuario
+                         };
 
             return Json(await DataSourceLoader.LoadAsync(tareas, loadOptions));
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Post(string values) {

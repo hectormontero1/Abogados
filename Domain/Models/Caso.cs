@@ -54,4 +54,8 @@ public partial class Caso
 
     [InverseProperty("IdCasoNavigation")]
     public virtual ICollection<TiempoFacturable> TiempoFacturables { get; set; } = new List<TiempoFacturable>();
+
+    
+    [InverseProperty("Casos")]
+    public virtual Consultorio Consultorio { get; set; } = null!;
 }
