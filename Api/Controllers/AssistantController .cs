@@ -10,7 +10,7 @@ public class AssistantController : ControllerBase
     private readonly HttpClient _httpClient;
     private readonly string _apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")!; // Reemplaza por tu API Key
     private readonly string _assistantId = ""; // Reemplaza por tu Assistant ID
-
+     
     public AssistantController()
     {
         _httpClient = new HttpClient();
