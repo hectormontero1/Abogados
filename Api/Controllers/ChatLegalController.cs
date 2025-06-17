@@ -51,7 +51,7 @@ namespace Api.Controllers
         [HttpPost("preguntar2")]
         public async Task<IActionResult> Preguntar2([FromBody] PreguntaRequest request)
         {
-            OpenAIService open = new OpenAIService("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");
+            OpenAIService open = new OpenAIService(Environment.GetEnvironmentVariable("OPENAI_API_KEY")!);
              var respuesta = await open.EnviarPreguntaAsync(request.Pregunta);
             return Ok(new { respuesta });
         }

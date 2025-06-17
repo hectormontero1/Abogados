@@ -8,8 +8,8 @@ using System.Text;
 public class AssistantController : ControllerBase
 {
     private readonly HttpClient _httpClient;
-    private readonly string _apiKey = "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"; // Reemplaza por tu API Key
-    private readonly string _assistantId = "asst_YzZlVNOaIlItQBrpkhv4hviX"; // Reemplaza por tu Assistant ID
+    private readonly string _apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")!; // Reemplaza por tu API Key
+    private readonly string _assistantId = ""; // Reemplaza por tu Assistant ID
 
     public AssistantController()
     {
