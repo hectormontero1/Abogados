@@ -26,4 +26,6 @@ public partial class Consultorio
     public string? Telefono { get; set; }
 
     public bool? Estado { get; set; }
+
+    public virtual ICollection<Caso> Casos { get; set; } = new List<Caso>();
 }

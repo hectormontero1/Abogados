@@ -11,60 +11,56 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Models;
-using Infrastructure.Data;
 
 namespace Api.Controllers
 {
     [Route("[controller]/[action]")]
-    public class ClientesController : Controller
+    public class ContactosClientesController : Controller
     {
         private AbogadosContext _context;
 
-        public ClientesController(AbogadosContext context) {
+        public ContactosClientesController(AbogadosContext context) {
             _context = context;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(DataSourceLoadOptions loadOptions,int id) {
-            var clientes = _context.Clientes.Select(i => new {
+        public async Task<IActionResult> Get(DataSourceLoadOptions loadOptions) {
+            var contactosclientes = _context.ContactosClientes.Select(i => new {
+                i.IdContacto,
                 i.IdCliente,
-                i.RazonSocial,
-                i.RucCedula,
-                i.RepresentanteLegal,
-                i.Correo,
-                i.Telefono,
-                i.Direccion,
-                i.IdConsultorio,
-                i.TipoCliente
-            }).Where(x=>x.IdConsultorio==id);
+                i.Nombre,
+                i.Cargo,
+                i.Email,
+                i.Telefono
+            });
 
             // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
             // This can make SQL execution plans more efficient.
             // For more detailed information, please refer to this discussion: https://github.com/DevExpress/DevExtreme.AspNet.Data/issues/336.
-            // loadOptions.PrimaryKey = new[] { "IdCliente" };
+            // loadOptions.PrimaryKey = new[] { "IdContacto" };
             // loadOptions.PaginateViaPrimaryKey = true;
 
-            return Json(await DataSourceLoader.LoadAsync(clientes, loadOptions));
+            return Json(await DataSourceLoader.LoadAsync(contactosclientes, loadOptions));
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(string values) {
-            var model = new Cliente();
+            var model = new ContactosCliente();
             var valuesDict = JsonConvert.DeserializeObject<IDictionary>(values);
             PopulateModel(model, valuesDict);
 
             if(!TryValidateModel(model))
                 return BadRequest(GetFullErrorMessage(ModelState));
 
-            var result = _context.Clientes.Add(model);
+            var result = _context.ContactosClientes.Add(model);
             await _context.SaveChangesAsync();
 
-            return Json(new { result.Entity.IdCliente });
+            return Json(new { result.Entity.IdContacto });
         }
 
         [HttpPut]
         public async Task<IActionResult> Put(int key, string values) {
-            var model = await _context.Clientes.FirstOrDefaultAsync(item => item.IdCliente == key);
+            var model = await _context.ContactosClientes.FirstOrDefaultAsync(item => item.IdContacto == key);
             if(model == null)
                 return StatusCode(409, "Object not found");
 
@@ -80,53 +76,54 @@ namespace Api.Controllers
 
         [HttpDelete]
         public async Task Delete(int key) {
-            var model = await _context.Clientes.FirstOrDefaultAsync(item => item.IdCliente == key);
+            var model = await _context.ContactosClientes.FirstOrDefaultAsync(item => item.IdContacto == key);
 
-            _context.Clientes.Remove(model);
+            _context.ContactosClientes.Remove(model);
             await _context.SaveChangesAsync();
         }
 
 
-        private void PopulateModel(Cliente model, IDictionary values) {
-            string ID_CLIENTE = nameof(Cliente.IdCliente);
-            string RAZON_SOCIAL = nameof(Cliente.RazonSocial);
-            string RUC_CEDULA = nameof(Cliente.RucCedula);
-            string REPRESENTANTE_LEGAL = nameof(Cliente.RepresentanteLegal);
-            string CORREO = nameof(Cliente.Correo);
-            string TELEFONO = nameof(Cliente.Telefono);
-            string DIRECCION = nameof(Cliente.Direccion);
-            string TIPO_CLIENTE = nameof(Cliente.TipoCliente);
+        [HttpGet]
+        public async Task<IActionResult> ClientesLookup(DataSourceLoadOptions loadOptions) {
+            var lookup = from i in _context.Clientes
+                         orderby i.RazonSocial
+                         select new {
+                             Value = i.IdCliente,
+                             Text = i.RazonSocial
+                         };
+            return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
+        }
+
+        private void PopulateModel(ContactosCliente model, IDictionary values) {
+            string ID_CONTACTO = nameof(ContactosCliente.IdContacto);
+            string ID_CLIENTE = nameof(ContactosCliente.IdCliente);
+            string NOMBRE = nameof(ContactosCliente.Nombre);
+            string CARGO = nameof(ContactosCliente.Cargo);
+            string EMAIL = nameof(ContactosCliente.Email);
+            string TELEFONO = nameof(ContactosCliente.Telefono);
+
+            if(values.Contains(ID_CONTACTO)) {
+                model.IdContacto = Convert.ToInt32(values[ID_CONTACTO]);
+            }
 
             if(values.Contains(ID_CLIENTE)) {
-                model.IdCliente = Convert.ToInt32(values[ID_CLIENTE]);
+                model.IdCliente = values[ID_CLIENTE] != null ? Convert.ToInt32(values[ID_CLIENTE]) : (int?)null;
             }
 
-            if(values.Contains(RAZON_SOCIAL)) {
-                model.RazonSocial = Convert.ToString(values[RAZON_SOCIAL]);
+            if(values.Contains(NOMBRE)) {
+                model.Nombre = Convert.ToString(values[NOMBRE]);
             }
 
-            if(values.Contains(RUC_CEDULA)) {
-                model.RucCedula = Convert.ToString(values[RUC_CEDULA]);
+            if(values.Contains(CARGO)) {
+                model.Cargo = Convert.ToString(values[CARGO]);
             }
 
-            if(values.Contains(REPRESENTANTE_LEGAL)) {
-                model.RepresentanteLegal = Convert.ToString(values[REPRESENTANTE_LEGAL]);
-            }
-
-            if(values.Contains(CORREO)) {
-                model.Correo = Convert.ToString(values[CORREO]);
+            if(values.Contains(EMAIL)) {
+                model.Email = Convert.ToString(values[EMAIL]);
             }
 
             if(values.Contains(TELEFONO)) {
                 model.Telefono = Convert.ToString(values[TELEFONO]);
-            }
-
-            if(values.Contains(DIRECCION)) {
-                model.Direccion = Convert.ToString(values[DIRECCION]);
-            }
-
-            if(values.Contains(TIPO_CLIENTE)) {
-                model.TipoCliente = Convert.ToString(values[TIPO_CLIENTE]);
             }
         }
 
@@ -141,16 +138,17 @@ namespace Api.Controllers
             return String.Join(" ", messages);
         }
 
+
         [HttpPost("CargarCSV")]
-        public async Task<IActionResult> CargarCSV([FromBody] List<Cliente> clientes)
+        public async Task<IActionResult> CargarCSV([FromBody] List<ContactosCliente> clientes)
         {
-            if (clientes== null || !clientes.Any())
+            if (clientes == null || !clientes.Any())
             {
                 return BadRequest("No se recibieron datos.");
             }
 
             // Agregar todos de una sola vez
-            await _context.Clientes.AddRangeAsync(clientes);
+            await _context.ContactosClientes.AddRangeAsync(clientes);
 
             // Guardar una sola vez
             await _context.SaveChangesAsync();

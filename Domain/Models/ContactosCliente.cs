@@ -31,4 +31,6 @@ public partial class ContactosCliente
     [ForeignKey("IdCliente")]
     [InverseProperty("ContactosClientes")]
     public virtual Cliente? IdClienteNavigation { get; set; }
+
+ 
 }
