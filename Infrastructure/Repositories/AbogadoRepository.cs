@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Models;
 using Domain.Repositorios;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using NLog;
 

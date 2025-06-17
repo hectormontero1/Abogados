@@ -2,9 +2,10 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Models;
+namespace Infrastructure.Data;
 
 public partial class AbogadosContext : DbContext
 {
@@ -20,6 +21,8 @@ public partial class AbogadosContext : DbContext
     public virtual DbSet<BitacoraCambio> BitacoraCambios { get; set; }
 
     public virtual DbSet<Caso> Casos { get; set; }
+
+    public virtual DbSet<ChatKnowledgeBase> ChatKnowledgeBases { get; set; }
 
     public virtual DbSet<Cliente> Clientes { get; set; }
 
@@ -81,6 +84,11 @@ public partial class AbogadosContext : DbContext
             entity.HasOne(d => d.IdClienteNavigation).WithMany(p => p.Casos)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Casos__IdCliente__4222D4EF");
+        });
+
+        modelBuilder.Entity<ChatKnowledgeBase>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ChatKnow__3214EC079CC6CC76");
         });
 
         modelBuilder.Entity<Cliente>(entity =>

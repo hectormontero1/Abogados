@@ -31,6 +31,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "[dbo].[ChatKnowledgeBase]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[Clientes]",
          "ObjectType": 0
       },

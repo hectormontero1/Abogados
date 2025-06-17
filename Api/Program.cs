@@ -1,6 +1,7 @@
 using System.Text;
 using Domain.Models;
 using Domain.Repositorios;
+using Infrastructure.Data;
 using Infrastructure.NewFolder;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using NLog;
 using NLog.Web;
+using Qdrant.Client;
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 try
 {
@@ -51,6 +53,8 @@ builder.Host.UseNLog(); // <-- Esto permite que lea desde appsettings.json
             ValidateIssuerSigningKey = true
         };
     });
+    Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mgo+DSMBMAY9C3t2XFhhQlJHfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTH5VdkNiWnxXdHBQRGBUWkZ/");
+
     builder.Services.AddControllers()
    .AddNewtonsoftJson(options =>
       options.SerializerSettings.ReferenceLoopHandling =
@@ -73,9 +77,17 @@ builder.Services.AddScoped<IAbogadoRepository, AbogadoRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
-var app = builder.Build();
+    builder.Services.AddSingleton(_ => new OpenAI.OpenAIClient("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"));
+    builder.Services.AddSingleton(_ => new QdrantClient("http://localhost", 6333));
+    //builder.Services.AddSingleton(RagController);
+    builder.Services.AddScoped<RagService>();
+    builder.Services.AddHttpClient("ConFirmaLenta", client =>
+    {
+        client.Timeout = TimeSpan.FromMinutes(5);
+    });
+    var app = builder.Build();
     app.UseCors("ApiCorsPolicy");
-    // Configure the HTTP request pipeline.
+    // Configure the HTTP request pipeline. 098ad2c8-6dfb-4a8d-955e-9f6f5425ad32|KcAPfQjYbtaQl4z9uPAj7teWGt-d7yNjqXlGBXQCwzRWtz_g7TVSoA
     if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

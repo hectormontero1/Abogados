@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Domain.Servicio;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,6 +18,7 @@ namespace Api.Controllers
         public ChatLegalController(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
+        
         }
         [HttpPost("generar")]
         public async Task<IActionResult> Generar([FromBody] DemandaRequest request)
@@ -43,6 +45,22 @@ namespace Api.Controllers
             var responseString = await response.Content.ReadAsStringAsync();
 
             return Content(responseString, "application/json");
+        }
+
+
+        [HttpPost("preguntar2")]
+        public async Task<IActionResult> Preguntar2([FromBody] PreguntaRequest request)
+        {
+            OpenAIService open = new OpenAIService("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");
+             var respuesta = await open.EnviarPreguntaAsync(request.Pregunta);
+            return Ok(new { respuesta });
+        }
+
+        [HttpPost("limpiar")]
+        public IActionResult Limpiar()
+        {
+            
+            return Ok(new { mensaje = "Historial limpiado." });
         }
 
         [HttpPost("preguntar")]
@@ -106,6 +124,10 @@ namespace Api.Controllers
         public void Delete(int id)
         {
         }
+    }
+    public class PreguntaRequest
+    {
+        public string Pregunta { get; set; }
     }
     public class ChatRequest
     {
