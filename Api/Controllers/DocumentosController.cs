@@ -24,7 +24,7 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(DataSourceLoadOptions loadOptions) {
+        public async Task<IActionResult> Get(DataSourceLoadOptions loadOptions, int id) {
             var documentos = _context.Documentos.Select(i => new {
                 i.IdDocumento,
                 i.NombreArchivo,
@@ -32,7 +32,7 @@ namespace Api.Controllers
                 i.RutaArchivo,
                 i.FechaSubida,
                 i.IdCaso
-            });
+            }).Where(x => x.IdCaso == id); ;
 
             // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
             // This can make SQL execution plans more efficient.
