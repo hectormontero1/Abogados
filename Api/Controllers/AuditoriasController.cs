@@ -19,7 +19,7 @@ namespace Api.Controllers
     public class AuditoriasController : Controller
     {
         private AbogadosContext _context;
-         
+          
         public AuditoriasController(AbogadosContext context) {
             _context = context;
         }
