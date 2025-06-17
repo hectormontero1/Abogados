@@ -11,7 +11,7 @@ public class CasoController : ControllerBase
     {
         _casoService = casoService;
     }
-
+     
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Caso>>> GetCasos()
     {
