@@ -24,7 +24,7 @@ namespace Api.Controllers
         public async Task<IActionResult> Generar([FromBody] DemandaRequest request)
         {
             var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "TU_API_KEY_OPENAI");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
 
             string prompt = $"Redacta una demanda legal de tipo '{request.Tipo}' con los siguientes datos: {request.Detalles}";
 
@@ -67,7 +67,7 @@ namespace Api.Controllers
         public async Task<IActionResult> Preguntar([FromBody] ChatRequest request)
         {
             var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "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");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
 
             var payload = new
             {
